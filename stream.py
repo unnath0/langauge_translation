@@ -1,3 +1,4 @@
+from PIL import Image, ImageDraw, ImageFont
 import cv2
 import pytesseract
 from googletrans import Translator
@@ -35,21 +36,27 @@ def display_translated_text(image, translated_text):
     result_image = np.zeros((h + black_area_height, w, 3), dtype=np.uint8)
     result_image[:h, :w] = image
 
-    # Set the text properties
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.6
-    color = (0, 255, 0)
-    thickness = 1
-    margin = 10
+    # Convert the OpenCV image to a PIL image
+    pil_image = Image.fromarray(result_image)
+
+    # Load a font
+    font_path = "GoNotoCurrent-Regular.ttf"  # Update this path to your custom TTF font file
+    font = ImageFont.truetype(font_path, 20)
+
+    # Create a drawing context
+    draw = ImageDraw.Draw(pil_image)
 
     # Wrap text to fit the image width
     wrapped_text = textwrap.wrap(translated_text, width=60)
 
     # Position the text in the black area
-    y0, dy = h + margin + 10, 20
-    for i, line in enumerate(wrapped_text):
-        y = y0 + i * dy
-        cv2.putText(result_image, line, (margin, y), font, font_scale, color, thickness, lineType=cv2.LINE_AA)
+    y = h + 20
+    for line in wrapped_text:
+        draw.text((10, y), line, font=font, fill=(0, 255, 0))
+        y += 30
+
+    # Convert the PIL image back to an OpenCV image
+    result_image = np.array(pil_image)
 
     return result_image
 
@@ -67,12 +74,12 @@ if uploaded_file is not None:
     st.image(opencv_image, channels="BGR")
 
     # Step 2: Detect the language of the text
-    lang = st.text_input("Enter language code(s) for OCR (e.g., 'hin' for Hindi, 'kan' for Kannada, 'hin+kan' for both)", 'eng')
+    lang = st.text_input("Enter language code(s) for OCR (e.g., 'hin' for Hindi, 'kan' for Kannada, 'hin+kan' for both)", 'hin+kan+en')
     detected_text = read_text_from_image(uploaded_file.name, lang=lang)
     st.write(f"Detected text: {detected_text}")
 
     # Step 3: Translate the text
-    dest_lang = st.text_input("Enter destination language code for translation", 'en')
+    dest_lang = st.selectbox("Select destination language for translation", ['en', 'hindi', 'kannada'])
     translated_text = translate_text(detected_text, src_lang='auto', dest_lang=dest_lang)
     st.write(f"Translated text: {translated_text}")
 
@@ -83,3 +90,14 @@ if uploaded_file is not None:
     result_image_rgb = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
     st.image(result_image_rgb)
 
+    # Step 5: Allow user to download the final image
+    # Encode the RGB image for download
+    _, buffer = cv2.imencode('.png', result_image)
+    byte_im = buffer.tobytes()
+
+    st.download_button(
+        label="Download image",
+        data=byte_im,
+        file_name="translated_image.png",
+        mime="image/png"
+    )
