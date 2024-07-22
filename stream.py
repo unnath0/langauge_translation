@@ -5,19 +5,16 @@ from googletrans import Translator
 import textwrap
 import streamlit as st
 import numpy as np
-import os
 
 # Function to preprocess the image for better OCR results
-def preprocess_image(image_path):
-    abs_path = os.path.abspath(image_path)
-    image = cv2.imread(abs_path)
+def preprocess_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gray = cv2.medianBlur(gray, 3)
     return gray
 
 # Function to read text from an image with language-specific models
-def read_text_from_image(image_path, lang='eng'):
-    image = preprocess_image(image_path)
+def read_text_from_image(image, lang='eng'):
+    image = preprocess_image(image)
     text = pytesseract.image_to_string(image, lang=lang)
     return text
 
@@ -75,7 +72,7 @@ if uploaded_file is not None:
 
     # Step 2: Detect the language of the text
     lang = st.text_input("Enter language code(s) for OCR (e.g., 'hin' for Hindi, 'kan' for Kannada, 'hin+kan' for both)", 'hin+kan+en')
-    detected_text = read_text_from_image(uploaded_file.name, lang=lang)
+    detected_text = read_text_from_image(opencv_image, lang=lang)
     st.write(f"Detected text: {detected_text}")
 
     # Step 3: Translate the text
@@ -101,3 +98,4 @@ if uploaded_file is not None:
         file_name="translated_image.png",
         mime="image/png"
     )
+
