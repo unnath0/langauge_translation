@@ -1,5 +1,5 @@
 pillow
-opencv-python
+opencv-python-headless
 pytesseract
 googletrans==4.0.0-rc1
 streamlit
