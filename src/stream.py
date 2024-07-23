@@ -5,6 +5,7 @@ from googletrans import Translator
 import textwrap
 import streamlit as st
 import numpy as np
+import requests
 
 # Function to preprocess the image for better OCR results
 def preprocess_image(image):
