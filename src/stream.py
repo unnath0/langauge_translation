@@ -61,7 +61,7 @@ def display_translated_text(image, translated_text):
 def home_page():
     st.markdown("<h1 style='text-align: center;'>JSSATEB</h1>", unsafe_allow_html=True)
     
-    st.image("https://github.com/unnath0/langauge_translation/blob/main/src%2Fjssateb_logo.jpeg", use_column_width=True)
+    st.image("https://raw.githubusercontent.com/unnath0/langauge_translation/blob/main/src%2Fjssateb_logo.jpeg", use_column_width=True)
     
     st.markdown("<h2 style='text-align: center;'>Team Members</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>1. Ahijnan S (1JS21CS004)</p>", unsafe_allow_html=True)
